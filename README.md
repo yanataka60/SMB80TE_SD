@@ -1,6 +1,6 @@
 # SHARP SM-B-80TEにSD-Cardとのロード、セーブ機能
 
-![TITLE]()
+![TITLE](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SMB80TE.JPG)
 
 　シリアル同期通信によりSM-B-80TEとSD_ACCESS(ARDUINO+SD-CARD)とのロード、セーブを提供するルーチンです。
 
@@ -30,7 +30,7 @@ Arduino　　　　　　　　　　SM-B-80TE
 
 　今回はTK-85用に用意したSD_ACCESS(ARDUINO+SD-CARD)を流用して繋いでいます。
 
-![SD-Cardアダプタ]()
+![SD-Cardアダプタ](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SD-CARD.JPG)
 
 　SM-B-80TE専用のSD_ACCESS基板を試作中です。
 
