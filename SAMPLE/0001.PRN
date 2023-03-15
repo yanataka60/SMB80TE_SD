@@ -1,0 +1,87 @@
+			  Z80 ASSEMBLER - ZASM VER 1.6
+  8000                	ROM		EQU		8000H		;ROM STARTING ADDRESS
+  00D0                	PIOAD	EQU		0D0h		;PIO A DATA
+  00D1                	PIOAC	EQU		0D1h		;PIO A CONTROL
+  00D2                	PIOBD	EQU		0D2h		;PIO B DATA
+  00D3                	PIOBC	EQU		0D3h		;PIO B CONTROL
+  00D8                	SYS		EQU		0D8H		;SYSTEM CONTROL
+  00D9                	INT		EQU		0D9h		;SYSTEM MNI PORT
+  07CC                	MODE	EQU		07CCh		;USER PROGRAM MODE
+  07CC                	STACK	EQU		07CCh		;MONITOR STACK
+  079A                	USER	EQU		079Ah		;USER STACK
+  07CD                	SEGBUF	EQU		07CDh		;SEGMENT BUFFER
+  07D5                	DISBUF	EQU		07D5h		;DISPLAY BUFFER
+  07DD                	FLAG	EQU		07DDh		;CHATTERING FLAG
+  07DF                	DATA	EQU		07DFh		;DATA REG.
+  07E1                	ADDR	EQU		07E1h		;ADDRESS REG.
+  07E3                	SAVE	EQU		07E3h		;USER REG. SAVE AREA
+  07FD                	BCOUNT	EQU		07FDh		;BREAK COUNTER
+  07FE                	BADDR	EQU		07FEh		;BREAK ADDRESS
+  8436                	DISP1	EQU		8436h
+  843B                	DISP2	EQU		843bh
+  8465                	SEGCON	EQU		8465h
+  8482                	KEYIN	EQU		8482h
+  84C3                	SCAN	EQU		84C3h
+                      	
+  0000                			ORG		0000h
+                      	
+  0000                	START:
+  0000  112C00        			LD		DE,DATA01
+  0003  1A            	ST1:	LD		A,(DE)
+  0004  FEFF          			CP		0FFH
+  0006  28F8          			JR		Z,START
+  0008  CD0D00        			CALL	DISP
+  000B  18F6          			JR		ST1
+                      			
+                      	
+  000D                	DISP:
+  000D  0608          			LD		B,8
+  000F  21D407        			LD		HL,SEGBUF+7
+  0012  1A            	LP1:	LD		A,(DE)
+  0013  77            			LD		(HL),A
+  0014  2B            			DEC		HL
+  0015  13            			INC		DE
+  0016  10FA          			DJNZ	LP1
+  0018  CD1C00        			CALL	WAIT
+  001B  C9            			RET
+                      	
+  001C                	WAIT:
+  001C  E5            			PUSH	HL
+  001D  D5            			PUSH	DE
+  001E  C5            			PUSH	BC
+  001F  F5            			PUSH	AF
+  0020  0610          			LD		B,10H
+  0022                	W1:
+  0022  CDC384        			CALL	SCAN
+  0025  10FB          			DJNZ	W1
+  0027  F1            			POP		AF
+  0028  C1            			POP		BC
+  0029  D1            			POP		DE
+  002A  E1            			POP		HL
+  002B  C9            			RET
+                      			
+  002C                	DATA01:
+  002C  01000000000000			DB		01h,00h,00h,00h,00h,00h,00h,00h
+  0034  00010000000000			DB		00h,01h,00h,00h,00h,00h,00h,00h
+  003C  00000100000000			DB		00h,00h,01h,00h,00h,00h,00h,00h
+  0044  00000001000000			DB		00h,00h,00h,01h,00h,00h,00h,00h
+  004C  00000000010000			DB		00h,00h,00h,00h,01h,00h,00h,00h
+  0054  00000000000100			DB		00h,00h,00h,00h,00h,01h,00h,00h
+  005C  00000000000001			DB		00h,00h,00h,00h,00h,00h,01h,00h
+  0064  00000000000000			DB		00h,00h,00h,00h,00h,00h,00h,01h
+  006C  00000000000000			DB		00h,00h,00h,00h,00h,00h,00h,02h
+  0074  00000000000000			DB		00h,00h,00h,00h,00h,00h,00h,04h
+  007C  00000000000000			DB		00h,00h,00h,00h,00h,00h,00h,08h
+  0084  00000000000008			DB		00h,00h,00h,00h,00h,00h,08h,00h
+  008C  00000000000800			DB		00h,00h,00h,00h,00h,08h,00h,00h
+  0094  00000000080000			DB		00h,00h,00h,00h,08h,00h,00h,00h
+  009C  00000008000000			DB		00h,00h,00h,08h,00h,00h,00h,00h
+  00A4  00000800000000			DB		00h,00h,08h,00h,00h,00h,00h,00h
+  00AC  00080000000000			DB		00h,08h,00h,00h,00h,00h,00h,00h
+  00B4  08000000000000			DB		08h,00h,00h,00h,00h,00h,00h,00h
+  00BC  10000000000000			DB		10h,00h,00h,00h,00h,00h,00h,00h
+  00C4  20000000000000			DB		20h,00h,00h,00h,00h,00h,00h,00h
+  00CC  FFFFFFFFFFFFFF			DB		0FFh,0FFh,0FFh,0FFh,0FFh,0FFh,0FFh,0FFh
+                      	
+  00D4                			END
+

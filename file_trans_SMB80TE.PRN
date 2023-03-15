@@ -1,0 +1,425 @@
+			  Z80 ASSEMBLER - ZASM VER 1.6
+  00D0                	PIOAD	EQU		0D0h		;PIO A DATA
+  00D1                	PIOAC	EQU		0D1h		;PIO A CONTROL
+  00D2                	PIOBD	EQU		0D2h		;PIO B DATA
+  00D3                	PIOBC	EQU		0D3h		;PIO B CONTROL
+  00D4                	PIOCD	EQU		0D4h		;PIO C DATA
+  00D5                	PIOCC	EQU		0D5h		;PIO C CONTROL
+  00D6                	PIODD	EQU		0D6h		;PIO D DATA
+  00D7                	PIODC	EQU		0D7h		;PIO D CONTROL
+  00DA                	LED		EQU		0DAh		;LED
+  00D8                	SYS		EQU		0D8H		;SYSTEM CONTROL
+  00D9                	INT		EQU		0D9h		;SYSTEM MNI PORT
+  07CC                	MODE	EQU		07CCh		;USER PROGRAM MODE
+  07CC                	STACK	EQU		07CCh		;MONITOR STACK
+  079A                	USER	EQU		079Ah		;USER STACK
+  07CD                	SEGBUF	EQU		07CDh		;SEGMENT BUFFER
+  07D5                	DISBUF	EQU		07D5h		;DISPLAY BUFFER
+  07DD                	FLAG	EQU		07DDh		;CHATTERING FLAG
+  07DF                	DATA	EQU		07DFh		;DATA REG.
+  07DF                	EADRS	EQU		07DFH		;(DATA)LOAD SAVE END ADDRESS
+  07E1                	ADDR	EQU		07E1h		;ADDRESS REG.
+  07E1                	SADRS	EQU		07E1H		;(ADDR)LOAD SAVE START ADDRESS
+  07E3                	SAVE	EQU		07E3h		;USER REG. SAVE AREA
+  07E9                	FNAME	EQU		07E9H
+  07EB                	SADIN	EQU		07EBH
+  07ED                	EADIN	EQU		07EDH
+  07FD                	BCOUNT	EQU		07FDh		;BREAK COUNTER
+  07FE                	BADDR	EQU		07FEh		;BREAK ADDRESS
+  8031                	MONST	EQU		8031H		;MONITOR RETURN ADDRESS
+  8436                	DISP1	EQU		8436h
+  843B                	DISP2	EQU		843bh
+  8465                	SEGCON	EQU		8465h
+  8482                	KEYIN	EQU		8482h
+  84C3                	SCAN	EQU		84C3h
+  F850                	MIN		EQU		0F850H      ;WORK -(07B0H)LOAD除外START ADDRES
+  F800                	MAX		EQU		0F800H      ;WORK -(07FFH+1)LOAD除外END ADDRESS
+                      	
+                      	;D4H Z80PIO PORTC
+                      	;7 OUT
+                      	;6 OUT
+                      	;5 OUT
+                      	;4 OUT
+                      	;3 OUT	FLG
+                      	;2 OUT	送信データ
+                      	;1 IN	CHK
+                      	;0 IN	受信データ
+                      	
+                      			
+  8800                			ORG		8800H
+                      	
+                      	;8800Hから実行でSD_LOAD
+  8800  C31688        			JP		SDLOAD
+                      	;8803Hから実行でSD_SAVE
+  8803  C3B888        			JP		SDSAVE
+                      	
+                      	;8806H MONITOR修正するなら8060HからここへJUMPさせる
+  8806  FE0C          			CP		0CH
+  8808  CA3886        			JP      Z,8638h
+  880B  FE0A          			CP		0AH
+  880D  CA1688        			JP		Z,SDLOAD
+  8810  FE0B          			CP		0BH
+  8812  CAB888        			JP		Z,SDSAVE
+  8815  C9            			RET
+                      			
+                      	
+                      	;受信ヘッダ情報をセットし、SDカードからLOAD実行
+                      	;FNAME <- 0000H～FFFFHを入力。
+                      	;         ファイルネームは「xxxx.BTK」となる。
+  8816  CDDE89        	SDLOAD:	CALL	INIT
+                      	
+                      	;******************* LOAD FILE NAME 入力 ***********************
+  8819  CD028A        			CALL	TCLR
+  881C  DD212A8A      			LD		IX,L_F
+  8820  CDE789        			CALL	TINP
+  8823  11E907        			LD		DE,FNAME	;LOAD FILE NAMEをHL退避エリアに退避
+  8826  CD208A        			CALL	TSTR
+                      	
+  8829  3E81          			LD		A,81H
+  882B  CD4789        			CALL	SNDBYTE		;LOADコマンド81Hを送信
+  882E  CD8189        			CALL	RCVBYTE		;状態取得(00H=OK)
+  8831  A7            			AND		A			;00以外ならERROR
+  8832  C20D89        			JP		NZ,SVERR
+  8835  11E907        	TKMODE5:LD		DE,FNAME
+  8838  1A            	TKMD5:	LD		A,(DE)		;FNAME取得
+  8839  CD4789        			CALL	SNDBYTE
+  883C  13            			INC		DE
+  883D  1A            			LD		A,(DE)
+  883E  CD4789        			CALL	SNDBYTE
+  8841  CD8189        			CALL	RCVBYTE		;状態取得(00H=OK)
+  8844  A7            			AND		A			;00以外ならERROR
+  8845  C20D89        			JP		NZ,SVERR
+  8848  CD5188        			CALL	HDRCV		;ヘッダ情報受信
+  884B  CD6A88        			CALL	DBRCV		;データ受信
+  884E  C30A89        			JP		MONRET		;MONITOR復帰
+                      	
+                      	;ヘッダ受信
+  8851  21E207        	HDRCV:	LD		HL,SADRS+1	;SADRS取得
+  8854  CD8189        			CALL	RCVBYTE
+  8857  77            			LD		(HL),A
+  8858  2B            			DEC		HL
+  8859  CD8189        			CALL	RCVBYTE
+  885C  77            			LD		(HL),A
+  885D  21E007        			LD		HL,EADRS+1	;EADRS取得
+  8860  CD8189        			CALL	RCVBYTE
+  8863  77            			LD		(HL),A
+  8864  2B            			DEC		HL
+  8865  CD8189        			CALL	RCVBYTE
+  8868  77            			LD		(HL),A
+  8869  C9            			RET
+                      	
+                      	;データ受信
+  886A  ED5BDF07      	DBRCV:	LD		DE,(EADRS)
+  886E  2AE107        			LD		HL,(SADRS)
+  8871  CD3B84        	DBRLOP:	CALL	DISP2
+  8874  CD8189        			CALL	RCVBYTE
+  8877  47            			LD		B,A
+  8878  CDC189        			CALL	JOGAI		;WORKエリアを識別して書き込みSKIP
+  887B  A7            			AND		A
+  887C  C28488        			JP		NZ,SKIP
+  887F  78            			LD		A,B
+  8880  77            			LD		(HL),A
+  8881  CD9388        			CALL	ADRSDSP
+  8884  7C            	SKIP:	LD		A,H
+  8885  BA            			CP		D
+  8886  C28E88        			JP		NZ,DBRLP1
+  8889  7D            			LD		A,L
+  888A  BB            			CP		E
+  888B  CA9288        			JP		Z,DBRLP2	;HL = DE までLOOP
+  888E  23            	DBRLP1:	INC		HL
+  888F  C37188        			JP		DBRLOP
+  8892  C9            	DBRLP2:	RET
+                      			
+                      	;SAVE、LOAD中経過表示
+  8893                	ADRSDSP:
+  8893  E5            			PUSH	HL
+  8894  D5            			PUSH	DE
+  8895  F5            			PUSH	AF
+  8896  EB            			EX		DE,HL		;DATA <- 現在ADRS
+  8897  21DF07        			LD		HL,DATA
+  889A  73            			LD		(HL),E
+  889B  23            			INC		HL
+  889C  72            			LD		(HL),D
+  889D  CD3684        			CALL	DISP1
+  88A0  CDC384        			CALL	SCAN
+  88A3  F1            			POP		AF
+  88A4  D1            			POP		DE
+  88A5  E1            			POP		HL
+  88A6  C9            			RET
+                      	
+                      	;SAVE、LOADエラー終了処理(F0H又はFFHをLEDに表示)
+  88A7  21DF07        	ERRDSP:	LD		HL,DATA
+  88AA  77            			LD		(HL),A
+  88AB  23            			INC		HL
+  88AC  77            			LD		(HL),A
+  88AD  23            			INC		HL
+  88AE  77            			LD		(HL),A
+  88AF  23            			INC		HL
+  88B0  77            			LD		(HL),A
+  88B1  CD3684        			CALL	DISP1
+  88B4  CDC384        			CALL	SCAN
+  88B7  C9            			RET
+                      	
+                      	;送信ヘッダ情報をセットし、SDカードへSAVE実行
+                      	;FNAME <- 0000H～FFFFHを入力。
+                      	;         ファイルネームは「xxxx.BTK」となる。
+                      	;SADIN <- 保存開始アドレス
+                      	;EADIN <- 保存終了アドレス
+                      	
+  88B8  CDDE89        	SDSAVE:	CALL	INIT
+                      	
+                      	;******************* SAVE FILE NAME 入力 ***********************
+  88BB  CD028A        			CALL	TCLR
+  88BE  DD212E8A      			LD		IX,S_F
+  88C2  CDE789        			CALL	TINP
+  88C5  11E907        			LD		DE,FNAME	;SAVE FILE NAMEをHL退避エリアに退避
+  88C8  CD208A        			CALL	TSTR
+                      	
+                      	;******************* SAVE START ADDRESS 入力 ***********************
+  88CB  CD028A        			CALL	TCLR
+  88CE  DD21328A      			LD		IX,S_S
+  88D2  CDE789        			CALL	TINP
+  88D5  11EB07        			LD		DE,SADIN	;SAVE START ADDRESSをDE退避エリアに退避
+  88D8  CD208A        			CALL	TSTR
+                      	
+                      	;******************* SAVE END ADDRESS 入力 ***********************
+  88DB  CD028A        			CALL	TCLR
+  88DE  DD21368A      			LD		IX,S_E
+  88E2  CDE789        			CALL	TINP
+  88E5  11ED07        			LD		DE,EADIN	;SAVE END ADDRESSをBC退避エリアに退避
+  88E8  CD208A        			CALL	TSTR
+                      	
+  88EB  3E80          			LD		A,80H
+  88ED  CD4789        			CALL	SNDBYTE		;SAVEコマンド80Hを送信
+  88F0  CD8189        			CALL	RCVBYTE		;状態取得(00H=OK)
+  88F3  A7            			AND		A			;00以外ならERROR
+  88F4  C20D89        			JP		NZ,SVERR
+  88F7                	TKMODE4:
+  88F7  11E907        			LD		DE,FNAME
+  88FA                	TKMD4:	
+  88FA  1A            			LD		A,(DE)		;FNAME取得
+  88FB  13            			INC		DE
+  88FC  1A            			LD		A,(DE)
+  88FD  CD1389        			CALL	HDSEND		;ヘッダ情報送信
+  8900  CD8189        			CALL	RCVBYTE		;状態取得(00H=OK)
+  8903  A7            			AND		A			;00以外ならERROR
+  8904  C20D89        			JP		NZ,SVERR
+  8907  CD2289        			CALL	DBSEND		;データ送信
+  890A                	SDSV3:
+                      	;		CALL	OKDSP		;SAVE情報表示
+  890A  C33180        	MONRET:	JP		MONST		;MONITOR復帰
+                      	
+  890D  CDA788        	SVERR:	CALL	ERRDSP		;FFH:FILE OPEN ERROR F0H:SDカード初期化ERROR
+  8910  C33180        			JP		MONST		;F1H;FILE存在ERROR
+                      	
+                      	;ヘッダ送信
+  8913  0606          	HDSEND:	LD		B,06H
+  8915  21E907        			LD		HL,FNAME	;FNAME送信、SADRS送信、EADRS送信
+  8918  7E            	HDSD1:	LD		A,(HL)
+  8919  CD4789        			CALL	SNDBYTE
+  891C  23            			INC		HL
+  891D  05            			DEC		B
+  891E  C21889        			JP		NZ,HDSD1
+  8921  C9            			RET
+                      	
+                      	;データ送信
+                      	;SADRSからEADRSまでを送信
+  8922  ED5BEB07      	DBSEND:	LD		DE,(SADIN)
+  8926  21E107        			LD		HL,ADDR
+  8929  73            			LD		(HL),E
+  892A  23            			INC		HL
+  892B  72            			LD		(HL),D
+  892C  EB            			EX		DE,HL
+  892D  ED5BED07      			LD		DE,(EADIN)
+  8931  7E            	DBSLOP:	LD		A,(HL)
+  8932  CD9388        			CALL	ADRSDSP
+  8935  CD4789        			CALL	SNDBYTE
+  8938  7C            			LD		A,H
+  8939  BA            			CP		D
+  893A  C24289        			JP		NZ,DBSLP1
+  893D  7D            			LD		A,L
+  893E  BB            			CP		E
+  893F  CA4689        			JP		Z,DBSLP2	;HL = DE までLOOP
+  8942  23            	DBSLP1:	INC		HL
+  8943  C33189        			JP		DBSLOP
+  8946  C9            	DBSLP2:	RET
+                      	
+                      	;1BYTE送信
+                      	;Aレジスタの内容を下位BITから送信
+  8947  C5            	SNDBYTE:PUSH 	BC
+  8948  0608          			LD		B,08H
+  894A  0F            	SBLOP1:	RRCA				;最下位BITをCフラグへ
+  894B  F5            			PUSH	AF
+  894C  D25489        			JP		NC,SBRES	;Cフラグ = 0
+  894F  3E01          	SBSET:	LD		A,01H		;Cフラグ = 1
+  8951  C35689        			JP		SBSND
+  8954  3E00          	SBRES:	LD		A,00H
+  8956  CD6089        	SBSND:	CALL	SND1BIT		;1BIT送信
+  8959  F1            			POP		AF
+  895A  05            			DEC		B
+  895B  C24A89        			JP		NZ,SBLOP1	;8BIT分LOOP
+  895E  C1            			POP		BC
+  895F  C9            			RET
+                      			
+                      	;1BIT送信
+                      	;Aレジスタ(00Hor01H)を送信する
+  8960                	SND1BIT:
+  8960  FE01          			CP		01H
+  8962  DBD4          			IN		A,(PIOCD)
+  8964  2804          			JR		Z,SB1
+  8966  E6FB          			AND		0FBH		;送信データ0
+  8968  1802          			JR		SB2
+  896A  F604          	SB1:	OR		04H			;送信データ1
+  896C  D3D4          	SB2:	OUT		(PIOCD),A	;PORTC BIT2 <-送信データ
+  896E  DBD4          			IN		A,(PIOCD)
+  8970  F608          			OR		08H
+  8972  D3D4          			OUT		(PIOCD),A	;PORTC BIT3 <- 1
+  8974  CDB189        			CALL	F1CHK		;PORTC BIT1が1になるまでLOOP
+  8977  DBD4          			IN		A,(PIOCD)
+  8979  E6F7          			AND		0F7H
+  897B  D3D4          			OUT		(PIOCD),A	;PORTC BIT3 <- 0
+  897D  CDB989        			CALL	F2CHK		;PORTC BIT1が0になるまでLOOP
+  8980  C9            			RET
+                      			
+                      	;1BYTE受信
+                      	;受信DATAをAレジスタにセットしてリターン
+  8981  C5            	RCVBYTE:PUSH 	BC
+  8982  0E00          			LD		C,00H
+  8984  0608          			LD		B,08H
+  8986  CD9889        	RBLOP1:	CALL	RCV1BIT		;1BIT受信
+  8989  A7            			AND		A			;A=0?
+  898A  79            			LD		A,C
+  898B  CA8F89        			JP		Z,RBRES		;0
+  898E  3C            	RBSET:	INC		A			;1
+  898F  0F            	RBRES:	RRCA				;Aレジスタ右SHIFT
+  8990  4F            			LD		C,A
+  8991  05            			DEC		B
+  8992  C28689        			JP		NZ,RBLOP1	;8BIT分LOOP
+  8995  79            			LD		A,C			;受信DATAをAレジスタへ
+  8996  C1            			POP		BC
+  8997  C9            			RET
+                      			
+                      	;1BIT受信
+                      	;受信BITをAレジスタに保存してリターン
+  8998  CDB189        	RCV1BIT:CALL	F1CHK		;PORTC BIT1が1になるまでLOOP
+  899B  DBD4          			IN		A,(PIOCD)
+  899D  F608          			OR		08H
+  899F  D3D4          			OUT		(PIOCD),A	;PORTC BIT2 <- 1
+  89A1  DBD4          			IN		A,(PIOCD)	;PORTC BIT0 <- 受信データ
+  89A3  E601          			AND		01H
+  89A5  F5            			PUSH	AF
+  89A6  CDB989        			CALL	F2CHK		;PORTC BIT1が0になるまでLOOP
+  89A9  DBD4          			IN		A,(PIOCD)
+  89AB  E6F7          			AND		0F7H
+  89AD  D3D4          			OUT		(PIOCD),A	;PORTC BIT2 <- 0
+  89AF  F1            			POP		AF			;受信DATAセット
+  89B0  C9            			RET
+                      			
+                      	;BUSYをCHECK(1)
+                      	; PORTC BIT1が1になるまでLOP
+  89B1  DBD4          	F1CHK:	IN		A,(PIOCD)
+  89B3  E602          			AND		02H			;PORTC BIT1 = 1?
+  89B5  CAB189        			JP		Z,F1CHK
+  89B8  C9            			RET
+                      	
+                      	;BUSYをCHECK(0)
+                      	; PORTC BIT1が0になるまでLOOP
+  89B9  DBD4          	F2CHK:	IN		A,(PIOCD)
+  89BB  E602          			AND		02H			;PORTC BIT1 = 0?
+  89BD  C2B989        			JP		NZ,F2CHK
+  89C0  C9            			RET
+                      	
+                      	;WORKエリアを識別
+                      	;07B0H～07FFHはLOADデータの書込みをSKIP
+  89C1  E5            	JOGAI:	PUSH	HL
+  89C2  D5            			PUSH	DE
+  89C3  EB            			EX		DE,HL
+  89C4                	JOGAI_TK:
+  89C4  2150F8        			LD		HL,MIN
+  89C7  19            			ADD		HL,DE
+  89C8  D2D289        			JP		NC,JGOK		;MIN未満ならOK
+  89CB  2100F8        			LD		HL,MAX
+  89CE  19            			ADD		HL,DE
+  89CF  D2D689        			JP		NC,JGERR	;MAX未満ならSKIP
+  89D2  AF            	JGOK:	XOR		A			;OKならAレジスタ=0
+  89D3  C3DB89        			JP		JGRTN
+  89D6  3E01          	JGERR:	LD		A,01H		;SKIP範囲ならAレジスタ=1
+  89D8  C3DB89        			JP		JGRTN
+  89DB  D1            	JGRTN:	POP		DE
+  89DC  E1            			POP		HL
+  89DD  C9            			RET
+                      	
+                      	;Z80PIO初期化
+  89DE                	INIT:
+                      	;出力BITをリセット
+  89DE  3ECF          	INIT2:	LD		A,0CFH			;モード3セット
+  89E0  D3D5          			OUT		(PIOCC),A
+  89E2  3E03          			LD		A,03H			;BIT0～1を入力、BIT2～6は出力
+  89E4  D3D5          			OUT		(PIOCC),A
+  89E6  C9            			RET
+                      			
+                      	;************************* FILE NAME等データ入力 ***************
+  89E7                	TINP:
+  89E7                	LP1:	
+  89E7  CD3684        			CALL	DISP1
+  89EA  CD0D8A        			CALL	TDSP
+  89ED  CDC384        			CALL	SCAN
+  89F0  CD8284        			CALL	KEYIN
+  89F3  FE10          			CP		10H
+  89F5  300A          			JR		NC,LP2		;0～F以外のキーが押されたら終了
+  89F7  21DF07        			LD		HL,DATA
+  89FA  ED6F          			RLD
+  89FC  23            			INC		HL
+  89FD  ED6F          			RLD
+  89FF  18E6          			JR		LP1
+  8A01  C9            	LP2:	RET
+                      	
+                      	;************************* LED DATA部表示クリア ******************
+                      	;データ表示部に表示するデータを0000にクリア
+  8A02                	TCLR:
+  8A02  AF            			XOR		A
+  8A03  21DF07        			LD		HL,DATA
+  8A06  77            			LD		(HL),A
+  8A07  23            			INC		HL
+  8A08  77            			LD		(HL),A
+  8A09  CD3B84        			CALL	DISP2
+  8A0C  C9            			RET
+                      			
+                      	;************************* 入力データ TITLE 表示 *******************
+                      	;IX <- 表示データADDRESS
+                      	;HL <- SEGBUF+7
+                      	;ADDRESS表示部にメッセージデータをセット
+  8A0D                	TDSP:
+  8A0D  DDE5          			PUSH	IX
+  8A0F  0604          			LD		B,04H
+  8A11  21D407        			LD		HL,SEGBUF+7
+  8A14  DD7E00        	TDSP1:	LD		A,(IX)
+  8A17  77            			LD		(HL),A
+  8A18  DD23          			INC		IX
+  8A1A  2B            			DEC		HL
+  8A1B  10F7          			DJNZ	TDSP1
+  8A1D  DDE1          			POP		IX
+  8A1F  C9            			RET
+                      	
+                      	;************************* FILE NAME等入力データ退避 ******************
+                      	;DE <- 退避アドレス
+                      	;HL <- DATA
+                      	;DATA表示部に入力した16進4桁の数値を(DE)に退避
+  8A20                	TSTR:
+  8A20  21DF07        			LD		HL,DATA
+  8A23  7E            			LD		A,(HL)
+  8A24  12            			LD		(DE),A
+  8A25  23            			INC		HL
+  8A26  13            			INC		DE
+  8A27  7E            			LD		A,(HL)
+  8A28  12            			LD		(DE),A
+  8A29  C9            			RET
+                      	
+                      	;************************* TITLE DATA ********************************
+  8A2A  38407100      	L_F:	DB		38h,40h,71h,00h		;'L-F' LOAD FILE NAME
+  8A2E  6D407100      	S_F:	DB		6Dh,40h,71h,00h		;'S-F' SAVE FILE NAME
+  8A32  6D406D00      	S_S:	DB		6Dh,40h,6Dh,00h		;'S-S' SAVE START ADDRESS
+  8A36  6D407900      	S_E:	DB		6Dh,40h,79h,00h		;'S-E' SAVE END ADDRESS
+                      	
+  8A3A                			END
+
