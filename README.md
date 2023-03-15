@@ -20,10 +20,10 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 | ------------ | ------------ |
 |5V|5V　B8|
 |GND|GND　B7|
-|9(FLG:output)|PORTC BIT1(CHK:input)　A4|
-|8(OUT:output)|PORTC BIT0(IN:input)　B4|
-|7(CHK:input)|PORTC BIT3(FLG:output)　A3|
-|6(IN:input)|PORTC BIT2(OUT:output)　 B3|
+|9(FLG:output)|A4　PORTC BIT1(CHK:input)|
+|8(OUT:output)|B4　PORTC BIT0(IN:input)|
+|7(CHK:input)|A3　PORTC BIT3(FLG:output)|
+|6(IN:input)|B3　PORTC BIT2(OUT:output)|
 
 　今回はTK-85用に用意したSD_ACCESS(ARDUINO+SD-CARD)を流用して繋いでいます。
 
