@@ -16,19 +16,14 @@
 
 SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参照してください。
 
-Arduino　　　　　　　　　　SM-B-80TE
-
-　　5V　　　　　　　-----　　5V　拡張Z80PIO外部端子 B8
-   
-　　GND　　　　　　-----　　GND　拡張Z80PIO外部端子 B7
-   
-　　9(FLG:output)　　　-----　　PORTC BIT1(CHK:input)　拡張Z80PIO外部端子 A4
-
-　　8(OUT:output)　　-----　　PORTC BIT0(IN:input)　拡張Z80PIO外部端子 B4
-
-　　7(CHK:input)　　　-----　　PORTC BIT3(FLG:output)　拡張Z80PIO外部端子 A3
-
-　　6(IN:input)　　　　-----　　PORTC BIT2(OUT:output)　拡張Z80PIO外部端子 B3
+|Arduino(SD_ACCESS)|拡張Z80PIO外部端子(SM-B-80TE)|
+| ------------ | ------------ |
+|5V|5V　B8|
+|GND|GND　B7|
+|9(FLG:output)|PORTC BIT1(CHK:input)　A4|
+|8(OUT:output)|PORTC BIT0(IN:input)　B4|
+|7(CHK:input)|PORTC BIT3(FLG:output)　A3|
+|6(IN:input)|PORTC BIT2(OUT:output)　 B3|
 
 　今回はTK-85用に用意したSD_ACCESS(ARDUINO+SD-CARD)を流用して繋いでいます。
 
