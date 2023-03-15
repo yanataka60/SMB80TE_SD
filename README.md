@@ -5,6 +5,8 @@
 　シリアル同期通信によりSM-B-80TEとSD_ACCESS(ARDUINO+SD-CARD)とのロード、セーブを提供するルーチンです。
 
 ## 必要なもの
+　Z80PIO 1個(標準搭載のZ80PIOとは別のZ80PIOが必要)
+
 　SD_ACCESS基板(「SD_ACCESS」リポジトリ参照)
 
 　2716 1個(MONITOR ROMを差し替えるなら2716 2個)
@@ -12,7 +14,7 @@
 　ピンヘッダ、フラットケーブル、ブレッドボード・ジャンパーワイヤ等(SD_ACCESS基板の接続方法により適宜用意してください)
 
 ## 接続方法
-標準搭載のZ80PIOはLEDとキーボートの制御にすべて使われているので拡張Z80PIOが必要です。
+SD_ACCESS(ARDUINO+SD-CARD)と拡張Z80PIOを接続します。拡張Z80PIO外部端子から接続する例を示します。
 
 SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参照してください。
 
@@ -35,7 +37,7 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 
 file_trans_SMB80TE.binを2716に書き込み、SM-B-80TEのIC3 ROMソケットに挿し込みます。
 
-file_trans_SMB80TE.binのSD用LOADルーチン(8800h)、SAVEルーチン(8803h)を直接実行することでSDへのLOAD、SAVEが行えますが、MONITOR-ROMにパッチを当てることでSHIFT+A(SD-LOAD)、SHIFT+B(SD-SAVE)で使えるようにすると便利です。
+file_trans_SMB80TE.binのSD用LOADルーチン(8800H)、SAVEルーチン(8803H)を直接実行することでSDへのLOAD、SAVEが行えますが、MONITOR-ROMにパッチを当てることでSHIFT+A(SD-LOAD)、SHIFT+B(SD-SAVE)で使えるようにすると便利です。
 
 　MONITOR-ROMの内容を読み出し、バイナリエディタ等で以下を修正し、2716に書き込み、MONITOR-ROMと差し替えます。
 
