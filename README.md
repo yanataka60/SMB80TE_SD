@@ -18,8 +18,8 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 
 |Arduino(SD_ACCESS)|拡張Z80PIO外部端子(SM-B-80TE)|
 | ------------ | ------------ |
-|5V|5V　B8|
-|GND|GND　B7|
+|5V|B8　5V|
+|GND|B7　GND|
 |9(FLG:output)|A4　PORTC BIT1(CHK:input)|
 |8(OUT:output)|B4　PORTC BIT0(IN:input)|
 |7(CHK:input)|A3　PORTC BIT3(FLG:output)|
