@@ -31,7 +31,13 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 
 ![SD-Cardアダプタ](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SD-CARD.JPG)
 
-　SM-B-80TE専用のSD_ACCESS基板を試作中です。
+　SM-B-80TE専用のSD_ACCESS基板を作ってみました。
+
+　基板データは、Kicadフォルダにあります。
+
+![SD-BOARD1](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SD-BORAD(1).JPG)
+
+![SD-BOARD2](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SD-BORAD(2).JPG)
 
 ## ROMの差し替え
 
