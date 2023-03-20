@@ -44,6 +44,7 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 |J3|MicroSD Card Adapter|1|Arduino等に使われる5V電源に対応したもの|
 |U2|Arduino_Pro_Mini_5V|1||
 ||40PinICソケット|1||
+|U1|Z80PIO|1|SM-B-80TEに増設済みであれば引き抜いて使用|
 
 ![SD-BOARD1](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SD-BORAD(1).JPG)
 
