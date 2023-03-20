@@ -54,7 +54,7 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 file_trans_SMB80TE.binを2716に書き込み、SM-B-80TEのIC3 ROMソケットに挿し込みます。
 
 ## MONITOR-ROMの差し替え
-SD用LOADルーチン(8800H)、SAVEルーチン(8803H)を直接実行することでSDへのLOAD、SAVEが行えますが、MONITOR-ROMにパッチを当てることでSHIFT+A(SD-LOAD)、SHIFT+B(SD-SAVE)で使えるようにすると便利です。
+SD用LOADルーチン(8800H)、SAVEルーチン(8803H)を直接実行することでSDへのLOAD、SAVEが行えますが、MONITOR-ROMにパッチを当て、SHIFT+A(SD-LOAD)、SHIFT+B(SD-SAVE)で使えるようにすると便利です。
 
 　MONITOR-ROMの内容を読み出し、バイナリエディタ等で以下を修正し、2716に書き込み、MONITOR-ROMと差し替えます。
 
