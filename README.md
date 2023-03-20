@@ -82,9 +82,9 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 　異常が無いと思われるのにエラーとなってしまう場合にはSD-CardアダプタのArduinoとSM-B-80TEの両方をリセットしてからやり直してみてください。
 
 ### Load
-#### (直接実行する場合)8800H
+ (直接実行する場合)8800H
 
-#### (MONITOR-ROMを差し替えた場合)SHIFT+A
+ (MONITOR-ROMを差し替えた場合)SHIFT+A
 
 　ADDRESS LEDに「L-F」と表示されるのでファイルNo(xxxx)を16進数4桁で入力してWRキーを押します。
 
@@ -95,9 +95,9 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 　「F0F0F0F0F0」と表示された場合はSD-Card未挿入、「F1F1F1F1F1」と表示された場合はファイルNoのファイルが存在しない場合です。確認してください。
 
 ### Save
-#### (直接実行する場合)8803H
+ (直接実行する場合)8803H
 
-#### (MONITOR-ROMを差し替えた場合)SHIFT+B
+ (MONITOR-ROMを差し替えた場合)SHIFT+B
 
 　ADDRESS LEDに「S-F」と表示されるのでファイルNo(xxxx)を16進数4桁で入力してWRキーを押します。
 
