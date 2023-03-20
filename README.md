@@ -51,10 +51,10 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 ![SD-BOARD2](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SD-BORAD(2).JPG)
 
 ## ROMへの書込み
-file_trans_SMB80TE.binを2716に書き込み、SM-B-80TEのIC3 ROMソケットに挿し込みます。
+　file_trans_SMB80TE.binを2716に書き込み、SM-B-80TEのIC3 ROMソケットに挿し込みます。
 
 ## MONITOR-ROMの差し替え
-SD用LOADルーチン(8800H)、SAVEルーチン(8803H)を直接実行することでSDへのLOAD、SAVEが行えますが、MONITOR-ROMにパッチを当て、SHIFT+A(SD-LOAD)、SHIFT+B(SD-SAVE)で使えるようにすると便利です。
+　SD用LOADルーチン(8800H)、SAVEルーチン(8803H)を直接実行することでSDへのLOAD、SAVEが行えますが、MONITOR-ROMにパッチを当て、SHIFT+A(SD-LOAD)、SHIFT+B(SD-SAVE)で使えるようにすると便利です。
 
 　MONITOR-ROMの内容を読み出し、バイナリエディタ等で以下を修正し、2716に書き込み、MONITOR-ROMと差し替えます。
 
@@ -74,7 +74,7 @@ SD用LOADルーチン(8800H)、SAVEルーチン(8803H)を直接実行するこ�
 
 　この16進数4桁がSM-B-80TEからSD-Card内のファイルを識別するファイルNoとなります。
 
-　btkの構造は、バイナリファイル本体データの先頭に開始アドレス、終了アドレスの4Byteのを付加した形になっています。
+　btkの構造は、バイナリファイル本体データの先頭に開始アドレス、終了アドレスの4Byteのを付加した形になっています。(SAMPLEフォルダの0001.bin、0001.btkを参照)
 
 　パソコンのクロスアセンブラ等でSM-B-80TE用の実行binファイルを作成したらバイナリエディタ等で先頭に開始アドレス、終了アドレスの4Byteを付加し、ファイル名を変更したものをSD-Cardのルートディレクトリに保存すればSM-B-80TEから呼び出せるようになります。
 
@@ -82,9 +82,9 @@ SD用LOADルーチン(8800H)、SAVEルーチン(8803H)を直接実行するこ�
 　異常が無いと思われるのにエラーとなってしまう場合にはSD-CardアダプタのArduinoとSM-B-80TEの両方をリセットしてからやり直してみてください。
 
 ### Load
-(直接実行する場合)8800H
+#### (直接実行する場合)8800H
 
-(MONITOR-ROMを差し替えた場合)SHIFT+A
+#### (MONITOR-ROMを差し替えた場合)SHIFT+A
 
 　ADDRESS LEDに「L-F」と表示されるのでファイルNo(xxxx)を16進数4桁で入力してWRキーを押します。
 
@@ -95,9 +95,9 @@ SD用LOADルーチン(8800H)、SAVEルーチン(8803H)を直接実行するこ�
 　「F0F0F0F0F0」と表示された場合はSD-Card未挿入、「F1F1F1F1F1」と表示された場合はファイルNoのファイルが存在しない場合です。確認してください。
 
 ### Save
-(直接実行する場合)8803H
+#### (直接実行する場合)8803H
 
-(MONITOR-ROMを差し替えた場合)SHIFT+B
+#### (MONITOR-ROMを差し替えた場合)SHIFT+B
 
 　ADDRESS LEDに「S-F」と表示されるのでファイルNo(xxxx)を16進数4桁で入力してWRキーを押します。
 
