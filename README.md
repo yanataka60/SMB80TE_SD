@@ -35,6 +35,16 @@ SD_ACCESS(ARDUINO+SD-CARD)については、「SD_ACCESS」リポジトリを参
 
 　基板データは、Kicadフォルダにあります。
 
+#### 部品
+|番号|品名|数量|備考|
+| ------------ | ------------ | ------------ | ------------ |
+|J1|細ピンヘッダ又は基板用リードフレーム|1|秋月電子通商 PHA-1x40SG又はSHP-001|
+||J2、J3のいずれか|||
+|J2|Micro_SD_Card_Kit|1|秋月電子通商 AE-microSD-LLCNV|
+|J3|MicroSD Card Adapter|1|Arduino等に使われる5V電源に対応したもの|
+|U2|Arduino_Pro_Mini_5V|1||
+||40PinICソケット|1||
+
 ![SD-BOARD1](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SD-BORAD(1).JPG)
 
 ![SD-BOARD2](https://github.com/yanataka60/SMB80TE_SD/blob/main/JPEG/SD-BORAD(2).JPG)
